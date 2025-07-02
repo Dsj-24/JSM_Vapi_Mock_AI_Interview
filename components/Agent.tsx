@@ -118,12 +118,13 @@ const Agent = ({
     setCallStatus(CallStatus.CONNECTING);
 
     // if (type === "generate") {
-      await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
+      await vapi.start(`workflow:${process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID}`, {
         variableValues: {
           username: userName,
           userid: userId,
         },
       });
+      console.log(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID)
     // } else {
     //   let formattedQuestions = "";
     //   if (questions) {
@@ -150,7 +151,7 @@ const Agent = ({
 
   return (
     <>
-      <div className="call-view">
+      <div className="call-view mb-10">
         {/* AI Interviewer Card */}
         <div className="card-interviewer">
           <div className="avatar">
@@ -207,14 +208,14 @@ const Agent = ({
               )}
             />
 
-            <span className="relative mt-6">
+            <span className="relative">
               {isCallInactiveOrFin
                 ? "Call"
                 : ". . ."}
             </span>
           </button>
         ) : (
-          <button className="btn-disconnect mt-6" onClick={handleDisconnect}>
+          <button className="btn-disconnect" onClick={handleDisconnect}>
             End
           </button>
         )}
