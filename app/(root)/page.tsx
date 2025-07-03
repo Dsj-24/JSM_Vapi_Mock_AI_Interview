@@ -3,8 +3,25 @@ import Image from "next/image";
 import Link from "next/link";
 import { dummyInterviews } from "@/constants";
 import InterViewCard from "@/components/InterViewCard";
+import { getCurrentUser} from "@/lib/actions/auth.action";
+import { getInterviewByUserId,getLatestInterviews } from "@/lib/actions/general.action";
 
-export default function HomePage() {
+export default async function HomePage() {
+
+const user = await getCurrentUser();
+
+const [userInterviews, latestInterviews] = await Promise.all([
+  await getInterviewByUserId(user?.id!),
+  await getLatestInterviews({ userId: user?.id! })
+]);
+
+//@ts-ignore
+const hasPastInterviews = userInterviews?.length > 0;
+//@ts-ignore
+const hasUpcomingInterviews = latestInterviews?.length > 0;
+
+
+
   return (
    <>
    <section  className="card-cta">
@@ -32,9 +49,15 @@ Practice on real interview questions and get instant feedback
 
    <div className="interviews-section">
  
- {dummyInterviews.map((interview)=>(<InterViewCard {...interview} key={interview.id}/>))}
- 
-{/* <p>There are no interviews taken</p> */}
+{
+  hasPastInterviews ? (
+    userInterviews?.map((interview) => (
+      <InterViewCard {...interview} key={interview.id} />
+    ))
+  ) : (
+    <p>You haven't taken any interviews yet</p>
+  )
+}
    </div>
    </section>
 
@@ -45,15 +68,18 @@ Practice on real interview questions and get instant feedback
 </h2>
 
 <div className="interviews-section">
-  {dummyInterviews.map((interview)=>(<InterViewCard {... interview} key={interview.id}/>))}
- {/* <p>There are no interviews available</p>  */}
+{hasUpcomingInterviews ? (
+  latestInterviews?.map((interview) => (
+    <InterViewCard {...interview} key={interview.id} />
+  ))
+) : (
+  <p>There are no new interviews available</p>
+)}
 </div>
 
 
    </section>
 
-
-   
    </>
   );
 }
